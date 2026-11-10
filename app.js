@@ -1,6 +1,6 @@
 'use strict';
-const VERSION = '1.6';
-const MIN_PLAYERS = 3, MAX_PLAYERS = 10, MIN_ACTIVE = 3;
+const VERSION = '1.7';
+const MIN_PLAYERS = 3, MIN_ACTIVE = 3;
 const KEY_NAMES = 'imposter.names';
 const KEY_GAME = 'imposter.game';
 
@@ -234,18 +234,17 @@ function render() {
 
 // Setup
 function renderSetup() {
-  const canStart = setupNames.length >= MIN_PLAYERS && setupNames.length <= MAX_PLAYERS;
+  const canStart = setupNames.length >= MIN_PLAYERS;
   $main.innerHTML = `<div class="screen">
     <h1>Wer spielt mit?</h1>
     <button class="btn red" id="startBtn" style="margin-top:8px" ${canStart ? '' : 'disabled'}>${ICON.play} ${canStart ? "Los geht's" : `Noch ${MIN_PLAYERS - setupNames.length} ${MIN_PLAYERS - setupNames.length === 1 ? 'Spieler fehlt' : 'Spieler fehlen'}`}</button>
-    <p class="muted" style="margin-top:14px">${MIN_PLAYERS} bis ${MAX_PLAYERS} Spieler, alle an einem Gerät. Die Reihenfolge hier ist die Reihenfolge beim Aufdecken.</p>
-    ${setupNames.length < MAX_PLAYERS ? `
+    <p class="muted" style="margin-top:14px">Ab ${MIN_PLAYERS} Spielern, alle an einem Gerät. Die Reihenfolge hier ist die Reihenfolge beim Aufdecken.</p>
     <form class="add-row" id="addForm" autocomplete="off">
       <input id="nameInput" type="text" placeholder="Name eingeben" maxlength="20" autocapitalize="words" autocorrect="off" spellcheck="false" enterkeyhint="done">
       <button class="btn" type="submit" aria-label="Hinzufügen">${ICON.plus}</button>
     </form>
     <div class="suggest" id="suggest"></div>
-    <div class="error" id="err"></div>` : '<p class="muted small">Maximal 10 Spieler erreicht.</p>'}
+    <div class="error" id="err"></div>
     <ul class="players">${setupNames.map((n, i) => `<li><span class="num">${i + 1}</span><span class="name">${esc(n)}</span><button class="x" data-remove="${i}" aria-label="${esc(n)} entfernen">×</button></li>`).join('')}</ul>
     <div class="grow"></div>
     <div class="version">Imposter v${VERSION} · ${WORDS.length} Begriffe</div>
@@ -291,7 +290,6 @@ function addName(raw) {
     err.textContent = `„${name}“ ist schon dabei.`;
     return;
   }
-  if (setupNames.length >= MAX_PLAYERS) return;
   setupNames.push(name);
   renderSetup();
   const input = document.getElementById('nameInput');

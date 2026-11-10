@@ -1,7 +1,7 @@
 {
   "name": "Imposter",
   "short_name": "Imposter",
-  "description": "Das Partyspiel Imposter für 3 bis 10 Spieler an einem Gerät.",
+  "description": "Das Partyspiel Imposter ab 3 Spielern an einem Gerät.",
   "lang": "de",
   "start_url": "./",
   "scope": "./",

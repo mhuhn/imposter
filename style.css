@@ -93,7 +93,7 @@ p { margin: 6px 0; }
 
 .hand { font-size: 17px; color: var(--muted); margin-top: 6vh; }
 .bigname { font-size: 44px; font-weight: 800; margin: 6px 0 4px; word-break: break-word; line-height: 1.1; }
-.progress { display: flex; gap: 6px; justify-content: center; margin: 14px 0; }
+.progress { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; margin: 14px 0; }
 .progress i { width: 10px; height: 10px; border-radius: 50%; background: var(--line); }
 .progress i.done { background: var(--slate); }
 .progress i.now { background: var(--red); }
