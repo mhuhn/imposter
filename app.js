@@ -1,5 +1,5 @@
 'use strict';
-const VERSION = '1.0';
+const VERSION = '1.1';
 const MIN_PLAYERS = 3, MAX_PLAYERS = 10, MIN_ACTIVE = 4;
 const KEY_NAMES = 'imposter.names';
 const KEY_GAME = 'imposter.game';
@@ -207,7 +207,7 @@ function wordCard(i) {
   const r = game.round;
   const [word, hint] = WORDS[r.pair];
   if (i === r.imposter) {
-    return `<div class="card imp"><div class="label">Psst …</div><div class="word">Du bist der Imposter!</div><div class="hint">Dein Hinweis<b>${esc(hint)}</b></div></div>`;
+    return `<div class="card"><div class="label">Imposter · Hinweis</div><div class="word">${esc(hint)}</div></div>`;
   }
   return `<div class="card"><div class="label">Dein Begriff</div><div class="word">${esc(word)}</div></div>`;
 }
@@ -310,7 +310,7 @@ function renderReveal() {
       ${wordCard(r.revealIdx)}
       <div class="grow"></div>
       <button class="btn" id="hide">${ICON.eyeOff} Verbergen</button>
-      <button class="btn ghost" id="unknown">${ICON.q} Kenne ich nicht</button>
+      <button class="btn ghost" id="unknown">${ICON.q} Kenne ich nicht / hatten wir schon</button>
     </div>`;
     document.getElementById('hide').onclick = nextReveal;
     document.getElementById('unknown').onclick = unknownDialog;
@@ -323,11 +323,11 @@ function unknownDialog() {
   const activeAfter = activeIdx().length - 1;
   const wouldAbort = activeAfter < MIN_ACTIVE;
   const html = isImp
-    ? `<h2>Hinweis unbekannt?</h2>
+    ? `<h2>Hinweis unbekannt oder schon gehabt?</h2>
        <p class="muted">Als Imposter kannst du nicht aussetzen. Du kannst die Runde abbrechen, dann gibt es für alle einen neuen Begriff.</p>
        <button class="btn red" data-m="abort">${ICON.stop} Runde abbrechen</button>
        <button class="btn ghost" data-m="close">Zurück</button>`
-    : `<h2>Begriff unbekannt?</h2>
+    : `<h2>Begriff unbekannt oder schon gehabt?</h2>
        <p class="muted">Du kannst diese Runde aussetzen oder die Runde für alle abbrechen und mit einem neuen Begriff neu starten.</p>
        <button class="btn" data-m="skip">${ICON.pause} Ich setze aus</button>
        ${wouldAbort ? `<p class="small muted center">Beim Aussetzen wären weniger als ${MIN_ACTIVE} Spieler übrig, dann wird die Runde automatisch abgebrochen.</p>` : ''}
@@ -335,7 +335,7 @@ function unknownDialog() {
        <button class="btn ghost" data-m="close">Zurück</button>`;
   openModal(html, action => {
     if (action === 'abort') {
-      abortRound(`${game.players[r.revealIdx].name} kannte ${isImp ? 'den Hinweis' : 'den Begriff'} nicht.`);
+      abortRound(`${game.players[r.revealIdx].name} kannte ${isImp ? 'den Hinweis' : 'den Begriff'} nicht oder hatte ihn schon.`);
     } else if (action === 'skip') {
       r.skipped.push(r.revealIdx);
       if (activeIdx().length < MIN_ACTIVE) {
@@ -372,7 +372,7 @@ function renderReady() {
     <button class="btn red" id="go">${ICON.play} Spiel starten</button>
   </div>`;
   $main.querySelectorAll('[data-peek]').forEach(b => b.onclick = () => {
-    r.peek = +b.dataset.peek; r.phase = 'peek'; save(); render();
+    r.peek = +b.dataset.peek; r.revealed = false; r.phase = 'peek'; save(); render();
   });
   document.getElementById('go').onclick = startDiscussion;
 }
@@ -380,13 +380,28 @@ function renderReady() {
 function renderPeek() {
   const r = game.round;
   const p = game.players[r.peek];
+  const back = () => { r.peek = null; r.revealed = false; r.phase = 'ready'; save(); render(); };
+  if (!r.revealed) {
+    $main.innerHTML = `<div class="screen center">
+      <div class="hand">Begriff nochmal ansehen</div>
+      <div class="bigname">${esc(p.name)}</div>
+      <p class="muted">Nur ${esc(p.name)} darf jetzt hinschauen.</p>
+      <div class="card covered">${ICON.q}<p>Begriff verdeckt</p></div>
+      <div class="grow"></div>
+      <button class="btn red" id="show">${ICON.eye} Aufdecken</button>
+      <button class="btn ghost" id="back">Zurück</button>
+    </div>`;
+    document.getElementById('show').onclick = () => { r.revealed = true; save(); render(); };
+    document.getElementById('back').onclick = back;
+    return;
+  }
   $main.innerHTML = `<div class="screen center">
     <div class="bigname" style="font-size:28px;margin-top:2vh">${esc(p.name)}</div>
     ${wordCard(r.peek)}
     <div class="grow"></div>
     <button class="btn" id="hide">${ICON.eyeOff} Verbergen</button>
   </div>`;
-  document.getElementById('hide').onclick = () => { r.peek = null; r.phase = 'ready'; save(); render(); };
+  document.getElementById('hide').onclick = back;
 }
 
 // Diskussion
