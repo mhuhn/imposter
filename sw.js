@@ -1,5 +1,5 @@
 // Netzwerk zuerst, Cache als Offline-Rückfall: Updates kommen beim nächsten Start an.
-const CACHE = 'imposter-v1.1';
+const CACHE = 'imposter-v1.2';
 const ASSETS = [
   './', 'index.html', 'style.css', 'app.js', 'words.js', 'manifest.webmanifest',
   'icons/apple-touch-icon.png', 'icons/icon-192.png', 'icons/icon-512.png',

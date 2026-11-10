@@ -1,5 +1,5 @@
 'use strict';
-const VERSION = '1.1';
+const VERSION = '1.2';
 const MIN_PLAYERS = 3, MAX_PLAYERS = 10, MIN_ACTIVE = 4;
 const KEY_NAMES = 'imposter.names';
 const KEY_GAME = 'imposter.game';
@@ -207,7 +207,7 @@ function wordCard(i) {
   const r = game.round;
   const [word, hint] = WORDS[r.pair];
   if (i === r.imposter) {
-    return `<div class="card"><div class="label">Imposter · Hinweis</div><div class="word">${esc(hint)}</div></div>`;
+    return `<div class="card"><div class="label"><span class="imp-tag">Imposter</span> · Hinweis</div><div class="word">${esc(hint)}</div></div>`;
   }
   return `<div class="card"><div class="label">Dein Begriff</div><div class="word">${esc(word)}</div></div>`;
 }
@@ -309,7 +309,7 @@ function renderReveal() {
       <div class="bigname" style="font-size:28px;margin-top:2vh">${esc(p.name)}</div>
       ${wordCard(r.revealIdx)}
       <div class="grow"></div>
-      <button class="btn" id="hide">${ICON.eyeOff} Verbergen</button>
+      <button class="btn" id="hide">${ICON.eyeOff} Habe ich mir gemerkt</button>
       <button class="btn ghost" id="unknown">${ICON.q} Kenne ich nicht / hatten wir schon</button>
     </div>`;
     document.getElementById('hide').onclick = nextReveal;
@@ -399,7 +399,7 @@ function renderPeek() {
     <div class="bigname" style="font-size:28px;margin-top:2vh">${esc(p.name)}</div>
     ${wordCard(r.peek)}
     <div class="grow"></div>
-    <button class="btn" id="hide">${ICON.eyeOff} Verbergen</button>
+    <button class="btn" id="hide">${ICON.eyeOff} Habe ich mir gemerkt</button>
   </div>`;
   document.getElementById('hide').onclick = back;
 }

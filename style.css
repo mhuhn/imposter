@@ -158,3 +158,4 @@ p { margin: 6px 0; }
   .bigname { font-size: 56px; }
   .card .word { font-size: 52px; }
 }
+.card .imp-tag { color: var(--red); }
