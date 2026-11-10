@@ -1,5 +1,5 @@
 'use strict';
-const VERSION = '1.4';
+const VERSION = '1.5';
 const MIN_PLAYERS = 3, MAX_PLAYERS = 10, MIN_ACTIVE = 4;
 const KEY_NAMES = 'imposter.names';
 const KEY_GAME = 'imposter.game';
@@ -299,29 +299,32 @@ function addName(raw) {
 }
 
 // Aufdecken
+// Gemeinsames Layout für verdeckt und aufgedeckt: Karte und Hauptbutton bleiben an derselben Stelle.
+function revealLayout({ top, name, card, primary, secondary }) {
+  return `<div class="screen center">
+    ${top}
+    <div class="bigname reveal-name">${esc(name)}</div>
+    <p class="muted">Nur ${esc(name)} darf jetzt hinschauen.</p>
+    ${card}
+    <div class="grow"></div>
+    ${primary}
+    ${secondary || '<button class="btn ghost spacer" tabindex="-1" aria-hidden="true">&nbsp;</button>'}
+  </div>`;
+}
+const coveredCard = () => `<div class="card covered">${ICON.q}<p>Begriff verdeckt</p></div>`;
+const showBtn = () => `<button class="btn red big" id="show">${ICON.eye} Aufdecken</button>`;
+const gotItBtn = () => `<button class="btn green big" id="hide">${ICON.check} Habe ich mir gemerkt</button>`;
+
 function renderReveal() {
   const r = game.round;
   const p = game.players[r.revealIdx];
+  const top = progressDots() + '<div class="hand">Gib das Gerät an</div>';
   if (!r.revealed) {
-    $main.innerHTML = `<div class="screen center">
-      ${progressDots()}
-      <div class="hand">Gib das Gerät an</div>
-      <div class="bigname">${esc(p.name)}</div>
-      <p class="muted">Nur ${esc(p.name)} darf jetzt hinschauen.</p>
-      <div class="card covered">${ICON.q}<p>Begriff verdeckt</p></div>
-      <div class="grow"></div>
-      <button class="btn red" id="show">${ICON.eye} Aufdecken</button>
-    </div>`;
+    $main.innerHTML = revealLayout({ top, name: p.name, card: coveredCard(), primary: showBtn() });
     document.getElementById('show').onclick = () => { r.revealed = true; save(); render(); };
   } else {
-    $main.innerHTML = `<div class="screen center">
-      ${progressDots()}
-      <div class="bigname" style="font-size:28px;margin-top:2vh">${esc(p.name)}</div>
-      ${wordCard(r.revealIdx)}
-      <div class="grow"></div>
-      <button class="btn" id="hide">${ICON.eyeOff} Habe ich mir gemerkt</button>
-      <button class="btn ghost" id="unknown">${ICON.q} Kenne ich nicht / hatten wir schon</button>
-    </div>`;
+    $main.innerHTML = revealLayout({ top, name: p.name, card: wordCard(r.revealIdx), primary: gotItBtn(),
+      secondary: `<button class="btn ghost" id="unknown">${ICON.q} Kenne ich nicht / hatten wir schon</button>` });
     document.getElementById('hide').onclick = nextReveal;
     document.getElementById('unknown').onclick = unknownDialog;
   }
@@ -391,26 +394,15 @@ function renderPeek() {
   const r = game.round;
   const p = game.players[r.peek];
   const back = () => { r.peek = null; r.revealed = false; r.phase = 'ready'; save(); render(); };
+  const top = '<div class="hand">Begriff nochmal ansehen</div>';
   if (!r.revealed) {
-    $main.innerHTML = `<div class="screen center">
-      <div class="hand">Begriff nochmal ansehen</div>
-      <div class="bigname">${esc(p.name)}</div>
-      <p class="muted">Nur ${esc(p.name)} darf jetzt hinschauen.</p>
-      <div class="card covered">${ICON.q}<p>Begriff verdeckt</p></div>
-      <div class="grow"></div>
-      <button class="btn red" id="show">${ICON.eye} Aufdecken</button>
-      <button class="btn ghost" id="back">Zurück</button>
-    </div>`;
+    $main.innerHTML = revealLayout({ top, name: p.name, card: coveredCard(), primary: showBtn(),
+      secondary: '<button class="btn ghost" id="back">Zurück</button>' });
     document.getElementById('show').onclick = () => { r.revealed = true; save(); render(); };
     document.getElementById('back').onclick = back;
     return;
   }
-  $main.innerHTML = `<div class="screen center">
-    <div class="bigname" style="font-size:28px;margin-top:2vh">${esc(p.name)}</div>
-    ${wordCard(r.peek)}
-    <div class="grow"></div>
-    <button class="btn" id="hide">${ICON.eyeOff} Habe ich mir gemerkt</button>
-  </div>`;
+  $main.innerHTML = revealLayout({ top, name: p.name, card: wordCard(r.peek), primary: gotItBtn() });
   document.getElementById('hide').onclick = back;
 }
 

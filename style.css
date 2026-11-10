@@ -100,8 +100,9 @@ p { margin: 6px 0; }
 .progress i.skip { background: transparent; border: 2px solid var(--line); }
 
 .card {
-  background: var(--card); border-radius: 24px; padding: 32px 20px; margin-top: 4vh;
+  background: var(--card); border-radius: 24px; padding: 20px; margin-top: 3vh;
   text-align: center; border: 3px solid var(--line);
+  min-height: 200px; display: flex; flex-direction: column; justify-content: center; align-items: center;
 }
 .card .label { font-size: 15px; color: var(--muted); font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
 .card .word { font-size: 40px; font-weight: 800; margin: 10px 0 0; word-break: break-word; line-height: 1.15; }
@@ -109,8 +110,9 @@ p { margin: 6px 0; }
 .card.imp .label { color: #FFDADB; }
 .card.imp .hint { margin-top: 18px; background: rgba(255,255,255,.16); border-radius: 14px; padding: 12px; font-size: 18px; }
 .card.imp .hint b { display: block; font-size: 28px; margin-top: 2px; }
-.card.covered { padding: 50px 20px; border-style: dashed; color: var(--muted); }
-.card.covered svg { width: 70px; height: 70px; }
+.card.covered { border-style: dashed; color: var(--muted); }
+.card.covered p { margin: 4px 0 0; }
+.card.covered svg { width: 64px; height: 64px; }
 
 .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; margin-top: 12px; }
 .pbtn {
@@ -159,3 +161,10 @@ p { margin: 6px 0; }
   .card .word { font-size: 52px; }
 }
 .card .imp-tag { color: var(--red); }
+.hand { margin-top: 3vh; }
+.reveal-name { font-size: 40px; }
+.btn.big { min-height: 76px; font-size: 21px; border-radius: 20px; }
+.btn.big svg { width: 26px; height: 26px; }
+.btn.green { background: var(--green); }
+.btn.spacer { visibility: hidden; }
+.btn.ghost { min-height: 66px; font-size: 16px; line-height: 1.25; }
