@@ -1,5 +1,5 @@
 'use strict';
-const VERSION = '1.3';
+const VERSION = '1.4';
 const MIN_PLAYERS = 3, MAX_PLAYERS = 10, MIN_ACTIVE = 4;
 const KEY_NAMES = 'imposter.names';
 const KEY_GAME = 'imposter.game';
@@ -237,7 +237,8 @@ function renderSetup() {
   const canStart = setupNames.length >= MIN_PLAYERS && setupNames.length <= MAX_PLAYERS;
   $main.innerHTML = `<div class="screen">
     <h1>Wer spielt mit?</h1>
-    <p class="muted">${MIN_PLAYERS} bis ${MAX_PLAYERS} Spieler, alle an einem Gerät. Die Reihenfolge hier ist die Reihenfolge beim Aufdecken.</p>
+    <button class="btn red" id="startBtn" style="margin-top:8px" ${canStart ? '' : 'disabled'}>${ICON.play} ${canStart ? "Los geht's" : `Noch ${MIN_PLAYERS - setupNames.length} ${MIN_PLAYERS - setupNames.length === 1 ? 'Spieler fehlt' : 'Spieler fehlen'}`}</button>
+    <p class="muted" style="margin-top:14px">${MIN_PLAYERS} bis ${MAX_PLAYERS} Spieler, alle an einem Gerät. Die Reihenfolge hier ist die Reihenfolge beim Aufdecken.</p>
     ${setupNames.length < MAX_PLAYERS ? `
     <form class="add-row" id="addForm" autocomplete="off">
       <input id="nameInput" type="text" placeholder="Name eingeben" maxlength="20" autocapitalize="words" autocorrect="off" spellcheck="false" enterkeyhint="done">
@@ -247,8 +248,6 @@ function renderSetup() {
     <div class="error" id="err"></div>` : '<p class="muted small">Maximal 10 Spieler erreicht.</p>'}
     <ul class="players">${setupNames.map((n, i) => `<li><span class="num">${i + 1}</span><span class="name">${esc(n)}</span><button class="x" data-remove="${i}" aria-label="${esc(n)} entfernen">×</button></li>`).join('')}</ul>
     <div class="grow"></div>
-    <button class="btn red" id="startBtn" ${canStart ? '' : 'disabled'}>${ICON.play} Los geht's</button>
-    ${!canStart ? `<p class="center muted small">${setupNames.length < MIN_PLAYERS ? `Noch ${MIN_PLAYERS - setupNames.length} ${MIN_PLAYERS - setupNames.length === 1 ? 'Spieler fehlt' : 'Spieler fehlen'}.` : ''}</p>` : ''}
     <div class="version">Imposter v${VERSION} · ${WORDS.length} Begriffe</div>
   </div>`;
 
