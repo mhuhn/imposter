@@ -1,6 +1,6 @@
 'use strict';
-const VERSION = '1.5';
-const MIN_PLAYERS = 3, MAX_PLAYERS = 10, MIN_ACTIVE = 4;
+const VERSION = '1.6';
+const MIN_PLAYERS = 3, MAX_PLAYERS = 10, MIN_ACTIVE = 3;
 const KEY_NAMES = 'imposter.names';
 const KEY_GAME = 'imposter.game';
 
@@ -334,16 +334,17 @@ function unknownDialog() {
   const r = game.round;
   const isImp = r.revealIdx === r.imposter;
   const activeAfter = activeIdx().length - 1;
-  const wouldAbort = activeAfter < MIN_ACTIVE;
+  const canSkip = activeAfter >= MIN_ACTIVE;
   const html = isImp
     ? `<h2>Hinweis unbekannt oder schon gehabt?</h2>
        <p class="muted">Als Imposter kannst du nicht aussetzen. Du kannst die Runde abbrechen, dann gibt es für alle einen neuen Begriff.</p>
        <button class="btn red" data-m="abort">${ICON.stop} Runde abbrechen</button>
        <button class="btn ghost" data-m="close">Zurück</button>`
     : `<h2>Begriff unbekannt oder schon gehabt?</h2>
-       <p class="muted">Du kannst diese Runde aussetzen oder die Runde für alle abbrechen und mit einem neuen Begriff neu starten.</p>
-       <button class="btn" data-m="skip">${ICON.pause} Ich setze aus</button>
-       ${wouldAbort ? `<p class="small muted center">Beim Aussetzen wären weniger als ${MIN_ACTIVE} Spieler übrig, dann wird die Runde automatisch abgebrochen.</p>` : ''}
+       ${canSkip
+         ? `<p class="muted">Du kannst diese Runde aussetzen oder die Runde für alle abbrechen und mit einem neuen Begriff neu starten.</p>
+       <button class="btn" data-m="skip">${ICON.pause} Ich setze aus</button>`
+         : `<p class="muted">Aussetzen geht nicht, dafür sind zu wenige Spieler dabei. Du kannst die Runde für alle abbrechen und mit einem neuen Begriff neu starten.</p>`}
        <button class="btn red" data-m="abort">${ICON.stop} Runde abbrechen</button>
        <button class="btn ghost" data-m="close">Zurück</button>`;
   openModal(html, action => {
