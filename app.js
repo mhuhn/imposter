@@ -1,5 +1,5 @@
 'use strict';
-const VERSION = '1.2';
+const VERSION = '1.3';
 const MIN_PLAYERS = 3, MAX_PLAYERS = 10, MIN_ACTIVE = 4;
 const KEY_NAMES = 'imposter.names';
 const KEY_GAME = 'imposter.game';
@@ -31,11 +31,24 @@ function load(key, fallback) {
 function store(key, value) {
   try { value === null ? localStorage.removeItem(key) : localStorage.setItem(key, JSON.stringify(value)); } catch (e) {}
 }
-function knownNames() { return load(KEY_NAMES, []); }
+// Gespeichert: [{ name, count, last }]; ältere Version speicherte nur Namen als Text.
+function nameStats() {
+  const raw = load(KEY_NAMES, []);
+  return raw.map((e, i) => typeof e === 'string' ? { name: e, count: 1, last: raw.length - i } : e);
+}
+// Häufigste zuerst, bei Gleichstand zuletzt genutzte zuerst.
+function knownNames() {
+  return nameStats().sort((a, b) => b.count - a.count || b.last - a.last).map(e => e.name);
+}
 function rememberNames(names) {
-  const lower = names.map(n => n.toLowerCase());
-  const rest = knownNames().filter(n => !lower.includes(n.toLowerCase()));
-  store(KEY_NAMES, names.concat(rest).slice(0, 200));
+  const stats = nameStats();
+  const now = Date.now();
+  names.forEach(n => {
+    const e = stats.find(x => x.name.toLowerCase() === n.toLowerCase());
+    if (e) { e.count++; e.last = now; e.name = n; } else stats.push({ name: n, count: 1, last: now });
+  });
+  stats.sort((a, b) => b.last - a.last);
+  store(KEY_NAMES, stats.slice(0, 200));
 }
 
 // ---------- Hilfen ----------
@@ -151,14 +164,12 @@ function nextRound() {
 }
 
 function endGame() {
-  rememberNames(game.players.map(p => p.name));
   game.round.phase = 'final';
   save();
   render();
 }
 
 function leaveGame() {
-  rememberNames(game.players.map(p => p.name));
   game = null;
   store(KEY_GAME, null);
   setupNames = [];
@@ -248,15 +259,15 @@ function renderSetup() {
     const showSuggest = () => {
       const q = input.value.trim().toLowerCase();
       err.textContent = '';
-      if (!q) { suggest.innerHTML = ''; return; }
       const taken = setupNames.map(n => n.toLowerCase());
       const hits = knownNames()
         .filter(n => !taken.includes(n.toLowerCase()) && n.toLowerCase() !== q)
-        .filter(n => n.toLowerCase().startsWith(q))
-        .slice(0, 6);
+        .filter(n => !q || n.toLowerCase().startsWith(q))
+        .slice(0, q ? 6 : 12);
       suggest.innerHTML = hits.map(n => `<button class="chip" type="button" data-name="${esc(n)}">${esc(n)}</button>`).join('');
     };
     input.addEventListener('input', showSuggest);
+    showSuggest();
     suggest.addEventListener('click', e => {
       const c = e.target.closest('[data-name]');
       if (c) addName(c.dataset.name);
